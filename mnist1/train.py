@@ -3,7 +3,7 @@ import torch.nn
 import torch.optim
 import torchvision.datasets
 import torchvision.transforms
-from  lenet import LeNet5
+from cnn_net import Net 
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -12,10 +12,10 @@ print(device)
 # 数据读取
 train_dataset = torchvision.datasets.MNIST(root='./data/mnist',
         train=True, transform=torchvision.transforms.ToTensor(),
-        download=True)
+        download=False)
 test_dataset = torchvision.datasets.MNIST(root='./data/mnist',
         train=False, transform=torchvision.transforms.ToTensor(),
-        download=True)
+        download=False)
 
 
 batch_size = 32
@@ -25,10 +25,10 @@ test_loader = torch.utils.data.DataLoader(
         dataset=test_dataset, batch_size=batch_size)
 
 
-net = LeNet5().to(device)
+net = Net().to(device)
 
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(net.parameters())   
+optimizer = torch.optim.Adam(net.parameters(),lr = 0.001)   
 
 # 训练
 num_epochs = 5
@@ -61,4 +61,4 @@ for images, labels in test_loader:
 accuracy = correct / total
 print('test accuracy: {:.1%}'.format(accuracy))
 
-torch.save(net,'mnist.pkl')
+torch.save(net.state_dict(),'mnist2.pt')

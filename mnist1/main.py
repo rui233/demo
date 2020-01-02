@@ -1,13 +1,14 @@
 import torch
 from torchvision import transforms
-from  lenet import LeNet5
 from tkinter import *
 import tkinter as tk
 from PIL import Image, ImageTk
 from Mouse import Mouse
 import os
+from lenet import LeNet5
 
-device = torch.device('cpu')
+
+device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 transform = transforms.Compose([
             transforms.Resize([32, 32]),
             transforms.ToTensor()
@@ -16,15 +17,18 @@ transform = transforms.Compose([
 
 def creat_image():
     print("create image")
-    mn = Mouse()
+    mn = Mouse()    
+        
     mn.create_image()
 
 def predict(curr_frame):
-    net = LeNet5()
-    net.load_state_dict(torch.load('/home/ray/git/mnist1/params.pkl'))
+    net = LeNet5
+    net.load_state_dict(torch.load('params.pkl'))
+    model.eval()
+    
     net.to(device)
     torch.no_grad()
-
+    
     trans_frame = transform(curr_frame).unsqueeze(0)
 
     input_frame = trans_frame.to(device)
@@ -75,12 +79,12 @@ class Application(tk.Frame):
         self.label.configure(image=self.png)
 
     def recognition(self):
-        print("begin to recogition")        
+        print("begin to recogition")     
         img = Image.open('/home/ray/git/mnist1/only.png')
-        img = img.resize((28, 28))
-        img.show()        
+        img = img.resize((28, 28))       
         net_img = img.convert('L')
         net_img.show()
+
         display = predict(net_img)
         print(display.item())
         self.numLabel.configure(text=str(display.item()))
